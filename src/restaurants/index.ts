@@ -67,45 +67,43 @@ export function generateReservationWindows({
   return windows;
 }
 
-// type AvailableTimesParameters = {
-//   capacity: number;
-//   start: DateTime;
-//   end: DateTime;
-// };
+type AvailableTimesParameters = {
+  capacity: number;
+  start: DateTime;
+  end: DateTime;
+};
 
-// export function availableTables(
-//   restaurant: Restaurant,
-//   params: AvailableTimesParameters,
-// ): number[] {
-//   if (restaurant.reservationWindows.length === 0) return [];
-//   if (!restaurantAcceptsReservationsStarting(restaurant, params.start)) {
-//     return [];
-//   }
-//
-//   const results = [];
-//   for (const table of restaurant.tables) {
-//     if (table.capacity < params.capacity) continue;
-//     if (table.minimum > params.capacity) continue;
-//     if (tableReservedAt(table, params.start)) continue;
-//
-//     results.push(table.id);
-//   }
-//   return results;
-// }
+export function availableTables(
+  restaurant: Restaurant,
+  params: AvailableTimesParameters,
+): Table[] {
+  if (restaurant.reservationWindows.length === 0) return [];
+  if (!restaurantAcceptsReservationsStarting(restaurant, params.start)) {
+    return [];
+  }
 
-// export function restaurantAcceptsReservationsStarting(
-//   restaurant: Restaurant,
-//   start: DateTime,
-// ): boolean {
-//   if (restaurant.reservationWindows.length === 0) return false;
-//
-//   for (const reservationWindow of restaurant.reservationWindows) {
-//     if (start < reservationWindow.start || start > reservationWindow.end)
-//       return false;
-//   }
-//
-//   return true;
-// }
+  return restaurant.tables.filter((table) => {
+    if (table.capacity < params.capacity) return false;
+    if (table.minimum > params.capacity) return false;
+    if (tableReservedAt(table, params.start)) return false;
+
+    return true;
+  });
+}
+
+export function restaurantAcceptsReservationsStarting(
+  restaurant: Restaurant,
+  start: DateTime,
+): boolean {
+  if (restaurant.reservationWindows.length === 0) return false;
+
+  for (const reservationWindow of restaurant.reservationWindows) {
+    if (start < reservationWindow.start || start > reservationWindow.end)
+      return false;
+  }
+
+  return true;
+}
 
 // TODO: Let the restaurant configure a "lag time" for reservations for cleanup
 export function tableReservedAt(table: Table, time: DateTime): boolean {

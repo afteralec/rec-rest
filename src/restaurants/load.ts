@@ -15,11 +15,12 @@ const DEFAULT_TIME_ZONE = "America/Los_Angeles";
 
 type LoadRestaurantsForSearchParameters = {
   dates: DateInput[];
+  dinerEndorsements: { [key: string]: boolean };
 };
 
 export async function loadRestaurantsForSearch(
   db: Knex<any, unknown[]>,
-  { dates }: LoadRestaurantsForSearchParameters,
+  { dates, dinerEndorsements }: LoadRestaurantsForSearchParameters,
 ): Promise<{ [key: number]: Restaurant }> {
   const result: { [key: number]: Restaurant } = {};
 
@@ -40,12 +41,21 @@ export async function loadRestaurantsForSearch(
 
   for (const { id, name } of restaurantRecords) {
     const zone = configs[id]?.zone || DEFAULT_TIME_ZONE;
+    const endorsements = endorsementsByRestaurantId[id];
+
+    if (
+      !endorsements.find(({ tag }) => {
+        return dinerEndorsements[tag];
+      })
+    ) {
+      continue;
+    }
 
     const restaurant: Restaurant = {
       id,
       name,
       tables: tablesByRestaurantId[id],
-      endorsements: endorsementsByRestaurantId[id],
+      endorsements,
       zone,
       reservationWindows: generateReservationWindows({
         zone,

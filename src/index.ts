@@ -2,9 +2,22 @@ import express from "express";
 import asyncHandler from "express-async-handler";
 import dotenv from "dotenv";
 import knex from "knex";
+import { DateTime } from "luxon";
 
 import { loadDinersForSearch } from "./diners";
-import { loadRestaurantsForSearch } from "./restaurants";
+import { loadRestaurantsForSearch, availableTables } from "./restaurants";
+import { buildDinerEndorsementsForSearch } from "./endorsements";
+
+const RESERVATION_DURATION_HOURS = 2;
+
+const ZONE_AMERICA_LOS_ANGELES = "America/Los_Angeles" as const;
+const ZONE_AMERICA_DENVER = "America/New_York" as const;
+
+type Zone = typeof ZONE_AMERICA_LOS_ANGELES | typeof ZONE_AMERICA_DENVER;
+const VALID_ZONES: { [key in Zone]: boolean } = {
+  [ZONE_AMERICA_LOS_ANGELES]: true,
+  [ZONE_AMERICA_DENVER]: true,
+};
 
 dotenv.config();
 
@@ -23,14 +36,17 @@ const db = knex({
 });
 
 export type DateInput = {
+  hour: number;
   day: number;
   month: number;
   year: number;
+  zone: string;
 };
 
 type SearchInput = {
   diners: string[];
   dates: DateInput[];
+  zone: Zone;
 };
 
 type ReserveInput = {
@@ -40,6 +56,9 @@ type ReserveInput = {
 
 // TODO: Let this function return a legible reason the input isn't valid
 function isDateInputValid(input: any): input is DateInput {
+  if (!("hour" in input)) return false;
+  if (typeof input.hour != "number") return false;
+
   if (!("day" in input)) return false;
   if (typeof input.day != "number") return false;
 
@@ -48,6 +67,13 @@ function isDateInputValid(input: any): input is DateInput {
 
   if (!("year" in input)) return false;
   if (typeof input.year != "number") return false;
+
+  return true;
+}
+
+function isZoneValid(zone: any): zone is Zone {
+  if (typeof zone != "string") return false;
+  if (!VALID_ZONES[zone as Zone]) return false;
 
   return true;
 }
@@ -76,6 +102,9 @@ function isSearchInputValid(input: any): input is SearchInput {
   if (!("dates" in input)) return false;
   if (!isDateInputArrayValid(input.dates)) return false;
 
+  if (!("zone" in input)) return false;
+  if (!isZoneValid(input.zone)) return false;
+
   return true;
 }
 
@@ -100,15 +129,62 @@ app.post(
     }
 
     const diners = await loadDinersForSearch(db, { names: input.diners });
-    console.dir(diners);
+    const dinersList = Object.values(diners);
+    const capacity = dinersList.length;
+    const dinerEndorsements = buildDinerEndorsementsForSearch(
+      Object.values(diners),
+    );
 
     const restaurants = await loadRestaurantsForSearch(db, {
       dates: input.dates,
+      dinerEndorsements,
     });
-    console.dir(restaurants);
+    const restaurantsList = Object.values(restaurants);
+
+    const reservationsAvailable = [];
+    for (const dateInput of input.dates) {
+      const start = DateTime.fromObject(dateInput);
+      const end = start.plus({ hours: RESERVATION_DURATION_HOURS });
+
+      for (const restaurant of restaurantsList) {
+        const tables = availableTables(restaurant, {
+          capacity,
+          start: start.setZone(restaurant.zone),
+          end,
+        });
+
+        for (const table of tables) {
+          const availableReservationStart = DateTime.fromObject(
+            dateInput,
+          ).setZone(restaurant.zone);
+
+          const availableReservation = {
+            restaurantName: restaurant.name,
+            capacity: table.capacity,
+            endorsements: restaurant.endorsements,
+            start: availableReservationStart.setZone(input.zone).toISO(),
+          };
+
+          reservationsAvailable.push(availableReservation);
+        }
+      }
+    }
+
+    const response = {
+      reservationsAvailable,
+    };
+
+    let json;
+    try {
+      json = JSON.stringify(response);
+    } catch {
+      res.status(500);
+      res.json('{ "message": "Something\'s gone terribly wrong." }');
+      return;
+    }
 
     res.status(200);
-    res.json('{ message: "Success." }');
+    res.json(json);
     return;
   }),
 );
