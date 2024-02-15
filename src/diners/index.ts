@@ -1,11 +1,14 @@
-import { DateTime } from "luxon";
+import type { DateTime } from "luxon";
 
-import { Endorsement, Reservation } from "./restaurants";
+import type { Endorsement } from "../endorsements";
+import type { Reservation } from "../reservations";
 
-export type DinerWithReservations = {
+export { loadDinersForSearch } from "./load";
+
+export type Diner = {
   id: number;
   name: string;
-  requiredEndorsements: Endorsement[];
+  endorsements: Endorsement[];
   reservations: Reservation[];
 };
 
@@ -15,7 +18,7 @@ type DinerCanReserveAtParameters = {
 };
 
 export function dinerCanReserveAt(
-  diner: DinerWithReservations,
+  diner: Diner,
   params: DinerCanReserveAtParameters,
 ): boolean {
   if (diner.reservations.length === 0) return true;

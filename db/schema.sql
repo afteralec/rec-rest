@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS diners
   updated_at      DATETIME DEFAULT(STRFTIME('%Y-%m-%dT%H:%M:%fZ', 'NOW')),
   name            TEXT NOT NULL
 );
-CREATE INDEX diners_name_key ON "diners"("name");
+CREATE INDEX diners_name ON "diners"("name");
 
 CREATE TABLE IF NOT EXISTS diners_endorsements
 (

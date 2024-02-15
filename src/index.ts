@@ -3,6 +3,7 @@ import asyncHandler from "express-async-handler";
 import dotenv from "dotenv";
 import knex from "knex";
 
+import { loadDinersForSearch } from "./diners";
 import { loadRestaurantsForSearch } from "./restaurants";
 
 dotenv.config();
@@ -27,6 +28,7 @@ export type DateInput = {
   year: number;
 };
 
+// TODO: Let this function return a legible reason the input isn't valid
 function isDateInputValid(input: any): input is DateInput {
   if (!("day" in input)) return false;
   if (typeof input.day != "number") return false;
@@ -45,6 +47,7 @@ type SearchInput = {
   dates: DateInput[];
 };
 
+// TODO: Let this function return a legible reason the input isn't valid
 function isSearchInputValid(input: any): input is SearchInput {
   if (!("diners" in input)) return false;
   if (!Array.isArray(input.diners)) return false;
@@ -66,31 +69,17 @@ app.post(
 
     if (!isSearchInputValid(input)) {
       res.status(400);
-      res.json('{ message: "Please provide a valid list of diners" }');
+      res.json('{ message: "please provide a valid input" }');
       return;
     }
+
+    const diners = await loadDinersForSearch(db, { names: input.diners });
+    console.dir(diners);
 
     const restaurants = await loadRestaurantsForSearch(db, {
       dates: input.dates,
     });
     console.dir(restaurants);
-
-    const dinerIDs = await db("diners")
-      .whereIn("name", req.body.diners)
-      .select("id");
-    const dinerReservations = await db("diners_reservations")
-      .whereIn(
-        "diner_id",
-        dinerIDs.map(({ id }) => id),
-      )
-      .select("diner_id", "reservation_id");
-
-    const reservations = await db("reservations")
-      .whereIn(
-        "id",
-        dinerReservations.map(({ reservation_id }) => reservation_id),
-      )
-      .select("id", "start", "end");
 
     res.status(200);
     res.json('{ message: "Success." }');

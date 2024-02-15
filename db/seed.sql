@@ -1,3 +1,5 @@
+BEGIN;
+
 DELETE FROM endorsements;
 DELETE FROM restaurants;
 DELETE FROM restaurant_configs;
@@ -98,11 +100,11 @@ INSERT INTO tables (restaurant_id, capacity, minimum) VALUES (5, 2, 1);
 -- No six-tops
 
 -- Fill with default reservation windows
-INSERT INTO restaurants_reservation_windows (restaurant_id, start, end) VALUES (1, 16, 21);
-INSERT INTO restaurants_reservation_windows (restaurant_id, start, end) VALUES (2, 16, 21);
-INSERT INTO restaurants_reservation_windows (restaurant_id, start, end) VALUES (3, 16, 21);
-INSERT INTO restaurants_reservation_windows (restaurant_id, start, end) VALUES (4, 16, 21);
-INSERT INTO restaurants_reservation_windows (restaurant_id, start, end) VALUES (5, 16, 21);
+INSERT INTO restaurants_reservation_windows (restaurant_id, start_hour, end_hour) VALUES (1, 16, 21);
+INSERT INTO restaurants_reservation_windows (restaurant_id, start_hour, end_hour) VALUES (2, 16, 21);
+INSERT INTO restaurants_reservation_windows (restaurant_id, start_hour, end_hour) VALUES (3, 16, 21);
+INSERT INTO restaurants_reservation_windows (restaurant_id, start_hour, end_hour) VALUES (4, 16, 21);
+INSERT INTO restaurants_reservation_windows (restaurant_id, start_hour, end_hour) VALUES (5, 16, 21);
 
 -- Create Michael
 INSERT INTO diners (id, name) VALUES (1, "Michael");
@@ -127,3 +129,5 @@ INSERT INTO diners (id, name) VALUES (5, "Tobias");
 -- Create Maeby
 INSERT INTO diners (id, name) VALUES (6, "Maeby");
 INSERT INTO diners_endorsements (diner_id, endorsement_id) VALUES (6, 3);
+
+COMMIT;
