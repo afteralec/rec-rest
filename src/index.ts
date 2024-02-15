@@ -11,12 +11,12 @@ import { buildDinerEndorsementsForSearch } from "./endorsements";
 const RESERVATION_DURATION_HOURS = 2;
 
 const ZONE_AMERICA_LOS_ANGELES = "America/Los_Angeles" as const;
-const ZONE_AMERICA_DENVER = "America/New_York" as const;
+const ZONE_AMERICA_NEW_YORK = "America/New_York" as const;
 
-type Zone = typeof ZONE_AMERICA_LOS_ANGELES | typeof ZONE_AMERICA_DENVER;
+type Zone = typeof ZONE_AMERICA_LOS_ANGELES | typeof ZONE_AMERICA_NEW_YORK;
 const VALID_ZONES: { [key in Zone]: boolean } = {
   [ZONE_AMERICA_LOS_ANGELES]: true,
-  [ZONE_AMERICA_DENVER]: true,
+  [ZONE_AMERICA_NEW_YORK]: true,
 };
 
 dotenv.config();
