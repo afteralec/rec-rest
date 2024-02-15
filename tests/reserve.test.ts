@@ -13,8 +13,17 @@ describe("Reserve inputs", () => {
       useNullAsDefault: true,
     });
 
-    await db("reservations").delete();
-    await db("diners_reservations").delete();
+    await db("reservations").del();
+    await db("diners_reservations").del();
+  });
+
+  test("can make a reservation given the correct inputs", async () => {
+    await axios.post("http://localhost:9090/reservations", {
+      restaurantId: 5,
+      zone: "America/New_York",
+      diners: ["Michael", "Gob"],
+      date: { month: 2, day: 20, year: 2024, hour: 17 },
+    });
   });
 
   test.fails(

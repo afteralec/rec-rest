@@ -174,7 +174,7 @@ app.post(
     }
 
     res.status(401);
-    res.json("{ 'message': 'That time isn't available to reserve.' }");
+    res.json("{ 'message': 'No available reservation times were found.' }");
     return;
   }),
 );
