@@ -5,7 +5,7 @@ import knex from "knex";
 import { DateTime } from "luxon";
 
 import { isSearchInputValid, isReserveInputValid } from "./input";
-import { loadDinersForSearch } from "./diners";
+import { loadDinersForSearch, dinerCanReserveAt } from "./diners";
 import { loadRestaurantsForSearch, availableReservations } from "./restaurants";
 import { saveReservation } from "./reservations";
 import { buildDinerEndorsementsForSearch } from "./endorsements";
@@ -93,6 +93,19 @@ app.post(
       Object.values(diners),
     );
 
+    const start = DateTime.fromObject(input.date, { zone: input.zone });
+    const end = start.plus({ hours: RESERVATION_DURATION_HOURS });
+
+    for (const diner of dinersList) {
+      if (!dinerCanReserveAt(diner, { start, end })) {
+        res.status(401);
+        res.json(
+          '{ "message": "That diner already has a reservation at that time." }',
+        );
+        return;
+      }
+    }
+
     const restaurants = await loadRestaurantsForSearch(db, {
       dates: [input.date],
       dinerEndorsements,
@@ -122,9 +135,6 @@ app.post(
     }
 
     for (const { tableId } of reservationsAvailable) {
-      const start = DateTime.fromObject(input.date, { zone: input.zone });
-      const end = start.plus({ hours: RESERVATION_DURATION_HOURS });
-
       try {
         await saveReservation(db, {
           tableId,
