@@ -147,7 +147,7 @@ app.post(
 
     if (reservationsAvailable.length === 0) {
       res.status(401);
-      res.json("{ 'message': 'That time isn't available to reserve. }");
+      res.json("{ 'message': 'That time isn't available to reserve.' }");
       return;
     }
 
@@ -174,7 +174,7 @@ app.post(
     }
 
     res.status(401);
-    res.json("{ 'message': 'That time isn't available to reserve. }");
+    res.json("{ 'message': 'That time isn't available to reserve.' }");
     return;
   }),
 );
