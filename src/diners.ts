@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 
-import { Endorsement, Reservation } from "./models";
+import { Endorsement, Reservation } from "./restaurants";
 
 export type DinerWithReservations = {
   id: number;

@@ -16,6 +16,27 @@ CREATE TABLE IF NOT EXISTS restaurants
 );
 CREATE UNIQUE INDEX restaurant_name_key ON "restaurants"("name");
 
+CREATE TABLE IF NOT EXISTS restaurant_configs
+(
+  id              INTEGER NOT NULL PRIMARY KEY,
+  created_at      DATETIME DEFAULT(STRFTIME('%Y-%m-%dT%H:%M:%fZ', 'NOW')),
+  updated_at      DATETIME DEFAULT(STRFTIME('%Y-%m-%dT%H:%M:%fZ', 'NOW')),
+  restaurant_id   INTEGER NOT NULL,
+  zone            TEXT NOT NULL DEFAULT "America/Los_Angeles"
+);
+CREATE UNIQUE INDEX restaurant_configs_restaurant_id ON "restaurant_configs"("restaurant_id");
+
+CREATE TABLE IF NOT EXISTS restaurants_reservation_windows
+(
+  id              INTEGER NOT NULL PRIMARY KEY,
+  created_at      DATETIME DEFAULT(STRFTIME('%Y-%m-%dT%H:%M:%fZ', 'NOW')),
+  updated_at      DATETIME DEFAULT(STRFTIME('%Y-%m-%dT%H:%M:%fZ', 'NOW')),
+  restaurant_id   INTEGER NOT NULL,
+  start_hour      INTEGER NOT NULL,
+  end_hour        INTEGER NOT NULL
+);
+CREATE INDEX restaurants_reservation_windows_restaurant_id ON "restaurants_reservation_windows"("restaurant_id");
+
 CREATE TABLE IF NOT EXISTS restaurants_endorsements
 (
   id              INTEGER NOT NULL PRIMARY KEY,
