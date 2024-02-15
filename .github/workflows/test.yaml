@@ -27,6 +27,6 @@ jobs:
       - name: Build the App
         run: npm run build
       - name: Run the App with PM2
-        run: pm2 start dist/index.js
+        run: pm2 start dist/src/index.js
       - name: Run Tests
         run: npm test
