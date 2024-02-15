@@ -1,7 +1,53 @@
-import { describe, test, expect } from "vitest";
+import { describe, test, afterAll } from "vitest";
+import knex from "knex";
 import axios from "axios";
 
 describe("Reserve inputs", () => {
+  // Minor cleanup to keep multiple test runs from failing
+  afterAll(async () => {
+    const db = knex({
+      client: "sqlite3",
+      connection: {
+        filename: "./db/rest.db",
+      },
+      useNullAsDefault: true,
+    });
+
+    await db("reservations").delete();
+    await db("diners_reservations").delete();
+  });
+
+  test.fails(
+    "cannot make a reservation if a diner is already reserved at that time",
+    async () => {
+      await axios.post("http://localhost:9090/reservations", {
+        restaurantId: 5,
+        zone: "America/New_York",
+        diners: ["Gob"],
+        date: { month: 2, day: 20, year: 2024, hour: 17 },
+      });
+
+      // Mimicking this by trying to post twice to the same time
+      await axios.post("http://localhost:9090/reservations", {
+        restaurantId: 4,
+        zone: "America/New_York",
+        diners: ["Gob"],
+        date: { month: 2, day: 20, year: 2024, hour: 17 },
+      });
+    },
+  );
+
+  test.fails(
+    "cannot make a reservation outside of the reservation window",
+    async () => {
+      await axios.post("http://localhost:9090/reservations", {
+        restaurantId: 5,
+        diners: ["Michael", "Gob"],
+        date: { month: 2, day: 20, year: 2024, hour: 12 },
+      });
+    },
+  );
+
   test.fails("Reserving without a zone returns an error code", async () => {
     await axios.post("http://localhost:9090/reservations", {
       restaurantId: 5,

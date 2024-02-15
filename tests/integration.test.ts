@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import axios from "axios";
 
-describe("Full operation integration test", () => {
+describe("Full operation integration tests", () => {
   test("can search, save, and delete a reservation given correct inputs", async () => {
     const dates = [];
     for (let hour = 0; hour <= 24; hour++) {
@@ -33,6 +33,7 @@ describe("Full operation integration test", () => {
       },
     );
 
+    // This serves as the necessary delete test
     const saveResponseBody = JSON.parse(saveResponse.data);
     const deleteResponse = await axios.delete(
       `http://localhost:9090/reservations/${saveResponseBody.reservationId}`,
