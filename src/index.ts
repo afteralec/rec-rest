@@ -35,12 +35,20 @@ app.post(
     const input: SearchInput | any = Object.assign({}, req.body);
     if (!isSearchInputValid(input)) {
       res.status(400);
-      res.json('{ message: "please provide a valid input" }');
+      res.json('{ "message": "please provide a valid input" }');
       return;
     }
 
     const diners = await loadDinersForSearch(db, { names: input.diners });
     const dinersList = Object.values(diners);
+
+    for (const name of input.diners) {
+      if (!dinersList.map(({ name }) => name).includes(name)) {
+        res.status(404);
+        res.json(`{ "message": The diner ${name} is not in the system }`);
+      }
+    }
+
     const dinerEndorsements = buildDinerEndorsementsForSearch(
       Object.values(diners),
     );
