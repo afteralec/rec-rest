@@ -28,6 +28,16 @@ export type DateInput = {
   year: number;
 };
 
+type SearchInput = {
+  diners: string[];
+  dates: DateInput[];
+};
+
+type ReserveInput = {
+  diners: string[];
+  date: DateInput;
+};
+
 // TODO: Let this function return a legible reason the input isn't valid
 function isDateInputValid(input: any): input is DateInput {
   if (!("day" in input)) return false;
@@ -42,22 +52,39 @@ function isDateInputValid(input: any): input is DateInput {
   return true;
 }
 
-type SearchInput = {
-  diners: string[];
-  dates: DateInput[];
-};
+function isDinersArrayValid(diners: any): diners is string[] {
+  if (!Array.isArray(diners)) return false;
+  if (diners.length === 0) return false;
+  if (typeof diners[0] != "string") return false;
+
+  return true;
+}
+
+function isDateInputArrayValid(dates: any): dates is DateInput[] {
+  if (!Array.isArray(dates)) return false;
+  if (dates.length === 0) return false;
+  if (!isDateInputValid(dates[0])) return false;
+
+  return true;
+}
 
 // TODO: Let this function return a legible reason the input isn't valid
 function isSearchInputValid(input: any): input is SearchInput {
   if (!("diners" in input)) return false;
-  if (!Array.isArray(input.diners)) return false;
-  if (input.diners.length === 0) return false;
-  if (typeof input.diners[0] != "string") return false;
+  if (!isDinersArrayValid(input.diners)) return false;
 
   if (!("dates" in input)) return false;
-  if (!Array.isArray(input.dates)) return false;
-  if (input.dates.length === 0) return false;
-  if (!isDateInputValid(input.dates[0])) return false;
+  if (!isDateInputArrayValid(input.dates)) return false;
+
+  return true;
+}
+
+function isReserveInputValid(input: any): input is ReserveInput {
+  if (!("diners" in input)) return false;
+  if (!isDinersArrayValid(input.diners)) return false;
+
+  if (!("date" in input)) return false;
+  if (!isDateInputValid(input.date)) return false;
 
   return true;
 }
@@ -66,7 +93,6 @@ app.post(
   "/reservations/search",
   asyncHandler(async (req, res, _next) => {
     const input: SearchInput | any = Object.assign({}, req.body);
-
     if (!isSearchInputValid(input)) {
       res.status(400);
       res.json('{ message: "please provide a valid input" }');
@@ -83,6 +109,32 @@ app.post(
 
     res.status(200);
     res.json('{ message: "Success." }');
+    return;
+  }),
+);
+
+app.post(
+  "/reservations",
+  asyncHandler(async (req, res, _next) => {
+    const input: ReserveInput | any = Object.assign({}, req.body);
+    if (!isReserveInputValid(input)) {
+      res.status(400);
+      res.json('{ message: "please provide a valid input" }');
+      return;
+    }
+
+    res.status(200);
+    res.json('{ message: "Success." }');
+    return;
+  }),
+);
+
+app.delete(
+  "/reservations",
+  asyncHandler(async (_req, res, _next) => {
+    res.status(200);
+    res.json('{ message: "Success." }');
+    return;
   }),
 );
 

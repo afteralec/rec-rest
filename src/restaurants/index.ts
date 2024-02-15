@@ -15,6 +15,13 @@ export type Restaurant = {
   reservationWindows: ReservationWindow[];
 };
 
+export type Table = {
+  id: number;
+  minimum: number;
+  capacity: number;
+  reservations: Reservation[];
+};
+
 export type ReservationWindow = {
   start: DateTime;
   end: DateTime;
@@ -112,10 +119,3 @@ export function tableReservedAt(table: Table, time: DateTime): boolean {
 
   return true;
 }
-
-export type Table = {
-  id: number;
-  minimum: number;
-  capacity: number;
-  reservations: Reservation[];
-};
