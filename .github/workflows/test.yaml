@@ -22,5 +22,7 @@ jobs:
         run: npm run db:setup
       - name: Seed Database
         run: npm run db:seed
+      - name: Run the App in Dev Mode
+        run: npm run dev
       - name: Run Tests
         run: npm test
