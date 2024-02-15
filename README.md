@@ -14,8 +14,9 @@ A non-RESTful toy API for reserving seats at restaurants!
 ### Setup steps
 
 1. Run `npm install` to install all dependencies
-2. Run `npm run db:setup` to create and migrate the schema into the database locally
-3. Run `npm run db:seed` to seed the database with the test data
+2. Run `npm run env:setup` to create a local `.env` file from the `.env.example`
+3. Run `npm run db:setup` to create and migrate the schema into the database locally
+4. Run `npm run db:seed` to seed the database with the test data
 
 ## Run the Integration Tests
 
