@@ -1,9 +1,22 @@
-import { describe, test, afterAll } from "vitest";
+import { describe, test, beforeAll, afterAll } from "vitest";
 import knex from "knex";
 import axios from "axios";
 
 describe("Reserve inputs", () => {
   // Minor cleanup to keep multiple test runs from failing
+  beforeAll(async () => {
+    const db = knex({
+      client: "sqlite3",
+      connection: {
+        filename: "./db/rest.db",
+      },
+      useNullAsDefault: true,
+    });
+
+    await db("reservations").delete();
+    await db("diners_reservations").delete();
+  });
+
   afterAll(async () => {
     const db = knex({
       client: "sqlite3",
@@ -13,8 +26,8 @@ describe("Reserve inputs", () => {
       useNullAsDefault: true,
     });
 
-    await db("reservations").del();
-    await db("diners_reservations").del();
+    await db("reservations").delete();
+    await db("diners_reservations").delete();
   });
 
   test("can make a reservation given the correct inputs", async () => {

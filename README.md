@@ -163,6 +163,7 @@ Some core assumptions and thoughts:
 
 Just a non-exhaustive roundup of some things I'd confront if I gave this more time:
 
+- Get CI working via Github Actions
 - Develop a layer for error handling
 - Add some logs, metrics, eventing and error tracking
 - Optimize some of the underlying queries (see Query Optimization)

@@ -1,9 +1,22 @@
-import { describe, test, expect, beforeAll } from "vitest";
+import { describe, test, expect, afterAll, beforeAll } from "vitest";
 import axios from "axios";
 import knex from "knex";
 
 describe("Full operation integration tests", () => {
   beforeAll(async () => {
+    const db = knex({
+      client: "sqlite3",
+      connection: {
+        filename: "./db/rest.db",
+      },
+      useNullAsDefault: true,
+    });
+
+    await db("reservations").del();
+    await db("diners_reservations").del();
+  });
+
+  afterAll(async () => {
     const db = knex({
       client: "sqlite3",
       connection: {
