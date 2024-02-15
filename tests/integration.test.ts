@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import axios from "axios";
 
-describe("Full operation integration teest", () => {
+describe("Full operation integration test", () => {
   test("can search, save, and delete a reservation given correct inputs", async () => {
     const dates = [];
     for (let hour = 0; hour <= 24; hour++) {

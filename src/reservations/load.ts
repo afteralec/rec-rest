@@ -8,7 +8,6 @@ export type ReservationRecord = {
   table_id: number;
   start: string;
   end: string;
-  canceled: boolean;
 };
 
 type DinerReservationRecord = {
@@ -21,7 +20,7 @@ export async function loadReservationsByTableId(
   tableIds: number[],
 ): Promise<{ [key: number]: Reservation[] }> {
   const reservationRecords = await db<ReservationRecord>("reservations")
-    .select("id", "table_id", "start", "end", "canceled")
+    .select("id", "table_id", "start", "end")
     .whereIn("table_id", tableIds);
   const reservationIds = reservationRecords.map(({ id }) => id);
 
@@ -61,7 +60,7 @@ export async function loadReservationsByDinerId(
   );
 
   const reservationRecords = await db<ReservationRecord>("reservations")
-    .select("id", "table_id", "start", "end", "canceled")
+    .select("id", "table_id", "start", "end")
     .whereIn("id", reservationIds);
 
   const dinerIdsByReservationId = await loadDinerIdsByReservationId(

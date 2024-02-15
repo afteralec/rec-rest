@@ -62,8 +62,7 @@ CREATE TABLE IF NOT EXISTS reservations
   created_at      DATETIME DEFAULT(STRFTIME('%Y-%m-%dT%H:%M:%fZ', 'NOW')),
   table_id        INTEGER NOT NULL,
   start           TEXT NOT NULL,
-  end             TEXT NOT NULL,
-  canceled        INTEGER DEFAULT "FALSE" 
+  end             TEXT NOT NULL
 );
 CREATE INDEX reservations_table_id ON "reservations"("table_id");
 

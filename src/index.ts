@@ -149,8 +149,6 @@ app.post(
         return;
       }
 
-      console.log("Saved reservation with id: ", reservationId);
-
       res.status(200);
       res.json(
         `{ "message": "Success!", "reservationId": "${reservationId}" }`,
@@ -167,11 +165,16 @@ app.post(
 app.delete(
   "/reservations/:id",
   asyncHandler(async (req, res, _next) => {
-    console.log(req.params);
     const { id } = req.params;
 
-    // TODO: Get the reservation by ID and if not found, return 404
-    console.log("delete reservation called with id: ", id);
+    const reservationRecords = await db("reservations")
+      .select("id")
+      .where("id", id);
+    if (reservationRecords.length === 0) {
+      res.status(404);
+      res.json(`{ "message": "There is no reservation with an id of ${id}"}`);
+      return;
+    }
 
     try {
       await deleteReservation(db, +id);
