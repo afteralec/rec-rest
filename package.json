@@ -27,7 +27,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "env:setup": "cp ./.env.example ./.env",
-    "db:setup": "rm ./db/rest.db && cat ./db/schema.sql | sqlite3 ./db/rest.db",
+    "db:setup": "rm -f ./db/rest.db && cat ./db/schema.sql | sqlite3 ./db/rest.db",
     "db:seed": "cat ./db/seed.sql | sqlite3 ./db/rest.db"
   },
   "author": "Alec DuBois",
