@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 
+import type { Zone } from "../zone";
 import type { Endorsement } from "../endorsements";
 import type { Reservation } from "../reservations";
 import type { DateInput } from "../input";
@@ -72,6 +73,64 @@ type AvailableTimesParameters = {
   start: DateTime;
   end: DateTime;
 };
+
+export type AvailableReservationsParameters = {
+  zone: Zone;
+  capacity: number;
+  dates: DateInput[];
+  durationHours: number;
+};
+
+export type AvailableReservation = {
+  restaurantId: number;
+  tableId: number;
+  restaurantName: string;
+  capacity: number;
+  endorsements: Endorsement[];
+  start: string;
+};
+
+export function availableReservations(
+  restaurants: Restaurant[],
+  { dates, capacity, zone, durationHours }: AvailableReservationsParameters,
+): AvailableReservation[] {
+  const results = [];
+  for (const dateInput of dates) {
+    const start = DateTime.fromObject(dateInput);
+    const end = start.plus({ hours: durationHours });
+
+    for (const restaurant of restaurants) {
+      const tables = availableTables(restaurant, {
+        capacity,
+        start: start.setZone(restaurant.zone),
+        end,
+      });
+
+      for (const table of tables) {
+        const availableReservationStart = DateTime.fromObject(
+          dateInput,
+        ).setZone(restaurant.zone);
+        const start = availableReservationStart.setZone(zone).toISO();
+        if (!start) {
+          // TODO: This is a catastrophic failure; handle this accordingly
+          continue;
+        }
+
+        const availableReservation = {
+          restaurantId: restaurant.id,
+          tableId: table.id,
+          restaurantName: restaurant.name,
+          capacity: table.capacity,
+          endorsements: restaurant.endorsements,
+          start,
+        };
+
+        results.push(availableReservation);
+      }
+    }
+  }
+  return results;
+}
 
 export function availableTables(
   restaurant: Restaurant,

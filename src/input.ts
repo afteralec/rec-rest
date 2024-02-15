@@ -16,23 +16,25 @@ export type SearchInput = {
 };
 
 export type ReserveInput = {
+  restaurantId: number;
   diners: string[];
+  zone: Zone;
   date: DateInput;
 };
 
 // TODO: Let this function return a legible reason the input isn't valid
 function isDateInputValid(input: any): input is DateInput {
   if (!("hour" in input)) return false;
-  if (typeof input.hour != "number") return false;
+  if (typeof input.hour !== "number") return false;
 
   if (!("day" in input)) return false;
-  if (typeof input.day != "number") return false;
+  if (typeof input.day !== "number") return false;
 
   if (!("month" in input)) return false;
-  if (typeof input.month != "number") return false;
+  if (typeof input.month !== "number") return false;
 
   if (!("year" in input)) return false;
-  if (typeof input.year != "number") return false;
+  if (typeof input.year !== "number") return false;
 
   return true;
 }
@@ -40,7 +42,7 @@ function isDateInputValid(input: any): input is DateInput {
 function isDinersArrayValid(diners: any): diners is string[] {
   if (!Array.isArray(diners)) return false;
   if (diners.length === 0) return false;
-  if (typeof diners[0] != "string") return false;
+  if (typeof diners[0] !== "string") return false;
 
   return true;
 }
@@ -68,8 +70,14 @@ export function isSearchInputValid(input: any): input is SearchInput {
 }
 
 export function isReserveInputValid(input: any): input is ReserveInput {
+  if (!("restaurantId" in input)) return false;
+  if (typeof input.restaurantId !== "number") return false;
+
   if (!("diners" in input)) return false;
   if (!isDinersArrayValid(input.diners)) return false;
+
+  if (!("zone" in input)) return false;
+  if (!isZoneValid(input.zone)) return false;
 
   if (!("date" in input)) return false;
   if (!isDateInputValid(input.date)) return false;

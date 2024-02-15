@@ -9,22 +9,34 @@ import type {
   RestaurantConfig,
   ReservationWindowTemplate,
 } from ".";
-import type { DateInput } from "..";
+import type { DateInput } from "../input";
 
 const DEFAULT_TIME_ZONE = "America/Los_Angeles";
 
 type LoadRestaurantsForSearchParameters = {
   dates: DateInput[];
   dinerEndorsements: { [key: string]: boolean };
+  restaurantId?: number;
 };
 
 export async function loadRestaurantsForSearch(
   db: Knex<any, unknown[]>,
-  { dates, dinerEndorsements }: LoadRestaurantsForSearchParameters,
+  {
+    dates,
+    dinerEndorsements,
+    restaurantId,
+  }: LoadRestaurantsForSearchParameters,
 ): Promise<{ [key: number]: Restaurant }> {
   const result: { [key: number]: Restaurant } = {};
 
-  const restaurantRecords = await db("restaurants").select("id", "name");
+  let restaurantRecords;
+  if (restaurantId) {
+    restaurantRecords = await db("restaurants")
+      .select("id", "name")
+      .where("id", restaurantId);
+  } else {
+    restaurantRecords = await db("restaurants").select("id", "name");
+  }
   const restaurantIds = restaurantRecords.map(({ id }) => id);
 
   const configs = await loadRestaurantConfigsByRestaurantId(db, restaurantIds);

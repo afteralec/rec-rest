@@ -6,7 +6,8 @@ import { DateTime } from "luxon";
 
 import { isSearchInputValid, isReserveInputValid } from "./input";
 import { loadDinersForSearch } from "./diners";
-import { loadRestaurantsForSearch, availableTables } from "./restaurants";
+import { loadRestaurantsForSearch, availableReservations } from "./restaurants";
+import { saveReservation } from "./reservations";
 import { buildDinerEndorsementsForSearch } from "./endorsements";
 import type { SearchInput, ReserveInput } from "./input";
 
@@ -40,7 +41,6 @@ app.post(
 
     const diners = await loadDinersForSearch(db, { names: input.diners });
     const dinersList = Object.values(diners);
-    const capacity = dinersList.length;
     const dinerEndorsements = buildDinerEndorsementsForSearch(
       Object.values(diners),
     );
@@ -51,34 +51,12 @@ app.post(
     });
     const restaurantsList = Object.values(restaurants);
 
-    const reservationsAvailable = [];
-    for (const dateInput of input.dates) {
-      const start = DateTime.fromObject(dateInput);
-      const end = start.plus({ hours: RESERVATION_DURATION_HOURS });
-
-      for (const restaurant of restaurantsList) {
-        const tables = availableTables(restaurant, {
-          capacity,
-          start: start.setZone(restaurant.zone),
-          end,
-        });
-
-        for (const table of tables) {
-          const availableReservationStart = DateTime.fromObject(
-            dateInput,
-          ).setZone(restaurant.zone);
-
-          const availableReservation = {
-            restaurantName: restaurant.name,
-            capacity: table.capacity,
-            endorsements: restaurant.endorsements,
-            start: availableReservationStart.setZone(input.zone).toISO(),
-          };
-
-          reservationsAvailable.push(availableReservation);
-        }
-      }
-    }
+    const reservationsAvailable = availableReservations(restaurantsList, {
+      dates: input.dates,
+      capacity: dinersList.length,
+      zone: input.zone,
+      durationHours: RESERVATION_DURATION_HOURS,
+    });
 
     const response = {
       reservationsAvailable,
@@ -109,8 +87,64 @@ app.post(
       return;
     }
 
-    res.status(200);
-    res.json('{ message: "Success." }');
+    const diners = await loadDinersForSearch(db, { names: input.diners });
+    const dinersList = Object.values(diners);
+    const dinerEndorsements = buildDinerEndorsementsForSearch(
+      Object.values(diners),
+    );
+
+    const restaurants = await loadRestaurantsForSearch(db, {
+      dates: [input.date],
+      dinerEndorsements,
+      restaurantId: input.restaurantId,
+    });
+    const restaurantsList = Object.values(restaurants);
+
+    if (restaurantsList.length === 0) {
+      res.status(404);
+      res.json(
+        `{ message: 'There are no restaurants with id ${input.restaurantId} and that match these diners\' endorsement requirements }`,
+      );
+      return;
+    }
+
+    const reservationsAvailable = availableReservations(restaurantsList, {
+      dates: [input.date],
+      capacity: dinersList.length,
+      zone: input.zone,
+      durationHours: RESERVATION_DURATION_HOURS,
+    });
+
+    if (reservationsAvailable.length === 0) {
+      res.status(401);
+      res.json("{ 'message': 'That time isn't available to reserve. }");
+      return;
+    }
+
+    for (const { tableId } of reservationsAvailable) {
+      const start = DateTime.fromObject(input.date, { zone: input.zone });
+      const end = start.plus({ hours: RESERVATION_DURATION_HOURS });
+
+      try {
+        await saveReservation(db, {
+          tableId,
+          dinerIds: dinersList.map(({ id }) => id),
+          start,
+          end,
+        });
+      } catch {
+        res.status(500);
+        res.json('{ "message": "Something\'s gone terribly wrong." }');
+        return;
+      }
+
+      res.status(200);
+      res.json('{ "message": "Success!" }');
+      return;
+    }
+
+    res.status(401);
+    res.json("{ 'message': 'That time isn't available to reserve. }");
     return;
   }),
 );
