@@ -166,8 +166,8 @@ Just a non-exhaustive roundup of some things I'd confront if I gave this more ti
 - Get CI working via Github Actions
 - Develop a layer for error handling
 - Add some logs, metrics, eventing and error tracking
-- Optimize some of the underlying queries (see Query Optimization)
-- Add a bunch more unit tests (see Testing)
+- Optimize some of the underlying queries (see Some Of These Queries Suck)
+- Add a bunch more unit tests (see Why Integration Tests?)
 - Flesh out the input handling to allow for different inputs, for example,
   a range of hours, days, or years
 - Input validation on the date values themselves - currently you can reserve
