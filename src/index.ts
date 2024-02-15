@@ -151,30 +151,25 @@ app.post(
       return;
     }
 
-    for (const { tableId } of reservationsAvailable) {
-      let reservationId;
-      try {
-        reservationId = await saveReservation(db, {
-          tableId,
-          dinerIds: dinersList.map(({ id }) => id),
-          start,
-          end,
-        });
-      } catch {
-        res.status(500);
-        res.json('{ "message": "Something\'s gone terribly wrong." }');
-        return;
-      }
+    // Just use the first available reservation
+    const { tableId } = reservationsAvailable[0];
 
-      res.status(200);
-      res.json(
-        `{ "message": "Success!", "reservationId": "${reservationId}" }`,
-      );
+    let reservationId;
+    try {
+      reservationId = await saveReservation(db, {
+        tableId,
+        dinerIds: dinersList.map(({ id }) => id),
+        start,
+        end,
+      });
+    } catch {
+      res.status(500);
+      res.json('{ "message": "Something\'s gone terribly wrong." }');
       return;
     }
 
-    res.status(401);
-    res.json("{ 'message': 'No available reservation times were found.' }");
+    res.status(200);
+    res.json(`{ "message": "Success!", "reservationId": "${reservationId}" }`);
     return;
   }),
 );
