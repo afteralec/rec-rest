@@ -7,7 +7,7 @@ import { DateTime } from "luxon";
 import { isSearchInputValid, isReserveInputValid } from "./input";
 import { loadDinersForSearch, dinerCanReserveAt } from "./diners";
 import { loadRestaurantsForSearch, availableReservations } from "./restaurants";
-import { saveReservation } from "./reservations";
+import { saveReservation, deleteReservation } from "./reservations";
 import { buildDinerEndorsementsForSearch } from "./endorsements";
 import type { SearchInput, ReserveInput } from "./input";
 
@@ -149,6 +149,8 @@ app.post(
         return;
       }
 
+      console.log("Saved reservation with id: ", reservationId);
+
       res.status(200);
       res.json(
         `{ "message": "Success!", "reservationId": "${reservationId}" }`,
@@ -163,8 +165,22 @@ app.post(
 );
 
 app.delete(
-  "/reservations",
-  asyncHandler(async (_req, res, _next) => {
+  "/reservations/:id",
+  asyncHandler(async (req, res, _next) => {
+    console.log(req.params);
+    const { id } = req.params;
+
+    // TODO: Get the reservation by ID and if not found, return 404
+    console.log("delete reservation called with id: ", id);
+
+    try {
+      await deleteReservation(db, +id);
+    } catch {
+      res.status(500);
+      res.json('{ "message": "Something\'s gone terribly wrong." }');
+      return;
+    }
+
     res.status(200);
     res.json('{ message: "Success." }');
     return;
