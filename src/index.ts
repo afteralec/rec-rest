@@ -135,8 +135,9 @@ app.post(
     }
 
     for (const { tableId } of reservationsAvailable) {
+      let reservationId;
       try {
-        await saveReservation(db, {
+        reservationId = await saveReservation(db, {
           tableId,
           dinerIds: dinersList.map(({ id }) => id),
           start,
@@ -149,7 +150,9 @@ app.post(
       }
 
       res.status(200);
-      res.json('{ "message": "Success!" }');
+      res.json(
+        `{ "message": "Success!", "reservationId": "${reservationId}" }`,
+      );
       return;
     }
 

@@ -5,6 +5,7 @@ DELETE FROM restaurants;
 DELETE FROM restaurant_configs;
 DELETE FROM restaurants_reservation_windows;
 DELETE FROM restaurants_endorsements;
+DELETE FROM reservations;
 DELETE FROM tables;
 DELETE FROM diners;
 DELETE FROM diners_endorsements;

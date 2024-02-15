@@ -11,7 +11,7 @@ export type SaveReservationParameters = {
 export async function saveReservation(
   db: Knex<any, unknown[]>,
   { tableId, dinerIds, start, end }: SaveReservationParameters,
-) {
+): Promise<number> {
   const reservationIds = await db("reservations").insert({
     start: start.toISO(),
     end: end.toISO(),
@@ -23,4 +23,6 @@ export async function saveReservation(
     return { diner_id: dinerId, reservation_id: reservationId };
   });
   await db("diners_reservations").insert(dinerReservations);
+
+  return reservationId;
 }
