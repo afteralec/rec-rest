@@ -1,7 +1,21 @@
-import { describe, test, expect } from "vitest";
+import { describe, test, expect, beforeAll } from "vitest";
 import axios from "axios";
+import knex from "knex";
 
 describe("Full operation integration tests", () => {
+  beforeAll(async () => {
+    const db = knex({
+      client: "sqlite3",
+      connection: {
+        filename: "./db/rest.db",
+      },
+      useNullAsDefault: true,
+    });
+
+    await db("reservations").delete();
+    await db("diners_reservations").delete();
+  });
+
   test("can search, save, and delete a reservation given correct inputs", async () => {
     const dates = [];
     for (let hour = 0; hour <= 24; hour++) {
