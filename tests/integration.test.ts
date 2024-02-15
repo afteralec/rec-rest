@@ -12,8 +12,8 @@ describe("Full operation integration tests", () => {
       useNullAsDefault: true,
     });
 
-    await db("reservations").delete();
-    await db("diners_reservations").delete();
+    await db("reservations").del();
+    await db("diners_reservations").del();
   });
 
   test("can search, save, and delete a reservation given correct inputs", async () => {
@@ -40,9 +40,9 @@ describe("Full operation integration tests", () => {
     const saveResponse = await axios.post(
       "http://localhost:9090/reservations",
       {
-        restaurantId: 5,
+        restaurantId: 1,
         zone: "America/New_York",
-        diners: ["Michael", "Gob"],
+        diners: ["Tobias", "Lucile"],
         date: { month: 2, day: 22, year: 2024, hour: 17 },
       },
     );

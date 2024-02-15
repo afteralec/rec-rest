@@ -19,10 +19,10 @@ describe("Reserve inputs", () => {
 
   test("can make a reservation given the correct inputs", async () => {
     await axios.post("http://localhost:9090/reservations", {
-      restaurantId: 5,
+      restaurantId: 1,
       zone: "America/New_York",
-      diners: ["Michael", "Gob"],
-      date: { month: 2, day: 20, year: 2024, hour: 17 },
+      diners: ["Tobias", "Lucile"],
+      date: { month: 2, day: 24, year: 2024, hour: 17 },
     });
   });
 
@@ -38,7 +38,7 @@ describe("Reserve inputs", () => {
 
       // Mimicking this by trying to post twice to the same time
       await axios.post("http://localhost:9090/reservations", {
-        restaurantId: 4,
+        restaurantId: 5,
         zone: "America/New_York",
         diners: ["Gob"],
         date: { month: 2, day: 20, year: 2024, hour: 17 },
