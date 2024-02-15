@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import axios from "axios";
 
-describe("Search", () => {
+describe("Search inputs", () => {
   test("Searching with valid input returns a success code", async () => {
     const dates = [];
     for (let hour = 0; hour <= 24; hour++) {

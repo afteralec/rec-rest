@@ -46,6 +46,7 @@ app.post(
       if (!dinersList.map(({ name }) => name).includes(name)) {
         res.status(404);
         res.json(`{ "message": The diner ${name} is not in the system }`);
+        return;
       }
     }
 
@@ -100,6 +101,14 @@ app.post(
     const dinerEndorsements = buildDinerEndorsementsForSearch(
       Object.values(diners),
     );
+
+    for (const name of input.diners) {
+      if (!dinersList.map(({ name }) => name).includes(name)) {
+        res.status(404);
+        res.json(`{ "message": The diner ${name} is not in the system }`);
+        return;
+      }
+    }
 
     const start = DateTime.fromObject(input.date, { zone: input.zone });
     const end = start.plus({ hours: RESERVATION_DURATION_HOURS });
