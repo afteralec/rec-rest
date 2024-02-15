@@ -1,0 +1,12 @@
+# MacOS
+.DS_Store
+
+# Dependencies and build directories
+node_modules
+dist/
+
+# Production .env files
+.env
+
+# Database file
+db/rest.db
