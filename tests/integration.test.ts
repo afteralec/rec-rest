@@ -55,8 +55,8 @@ describe("Full operation integration tests", () => {
       {
         restaurantId: 1,
         zone: "America/New_York",
-        diners: ["Tobias", "Lucile"],
-        date: { month: 2, day: 22, year: 2024, hour: 17 },
+        diners: ["Michael", "Gob"],
+        date: { month: 2, day: 20, year: 2024, hour: 17 },
       },
     );
 

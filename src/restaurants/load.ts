@@ -1,5 +1,6 @@
 import type { Knex } from "knex";
 
+import { DEFAULT_ZONE } from "../zone";
 import { generateReservationWindows } from ".";
 import { loadEndorsementsByRestaurantId } from "../endorsements";
 import { loadReservationsByTableId } from "../reservations";
@@ -10,8 +11,6 @@ import type {
   ReservationWindowTemplate,
 } from ".";
 import type { DateInput } from "../input";
-
-const DEFAULT_TIME_ZONE = "America/Los_Angeles";
 
 type LoadRestaurantsForSearchParameters = {
   dates: DateInput[];
@@ -52,7 +51,7 @@ export async function loadRestaurantsForSearch(
     await loadReservationWindowTemplatesByRestaurantId(db, restaurantIds);
 
   for (const { id, name } of restaurantRecords) {
-    const zone = configs[id]?.zone || DEFAULT_TIME_ZONE;
+    const zone = configs[id]?.zone || DEFAULT_ZONE;
     const endorsements = endorsementsByRestaurantId[id];
 
     if (

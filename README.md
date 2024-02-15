@@ -39,7 +39,7 @@ A restaurant has the following direct properties:
 A restaurant:
 
 1. Has many Tables
-2. Has many Endorsements, via the table
+2. Has many Endorsements
 
 ### Restaurant Configs
 
@@ -166,7 +166,8 @@ Just a non-exhaustive roundup of some things I'd confront if I gave this more ti
 - Get CI working via Github Actions
 - Develop a layer for error handling
 - Add some logs, metrics, eventing and error tracking
-- Optimize some of the underlying queries (see Some Of These Queries Suck)
+- Optimize some of the underlying queries and put everything in Transactions
+  (see Some Of These Queries Suck)
 - Add a bunch more unit tests (see Why Integration Tests?)
 - Flesh out the input handling to allow for different inputs, for example,
   a range of hours, days, or years

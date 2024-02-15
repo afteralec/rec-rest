@@ -22,7 +22,6 @@ export type ReserveInput = {
   date: DateInput;
 };
 
-// TODO: Let this function return a legible reason the input isn't valid
 function isDateInputValid(input: any): input is DateInput {
   if (!("hour" in input)) return false;
   if (typeof input.hour !== "number") return false;
@@ -69,6 +68,7 @@ export function isSearchInputValid(input: any): input is SearchInput {
   return true;
 }
 
+// TODO: Let this function return a legible reason the input isn't valid
 export function isReserveInputValid(input: any): input is ReserveInput {
   if (!("restaurantId" in input)) return false;
   if (typeof input.restaurantId !== "number") return false;

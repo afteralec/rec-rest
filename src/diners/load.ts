@@ -2,7 +2,7 @@ import type { Knex } from "knex";
 
 import type { Diner } from ".";
 import { loadEndorsementsByDinerId } from "../endorsements";
-import { loadReservationsByDinerId, type Reservation } from "../reservations";
+import { loadReservationsByDinerId } from "../reservations";
 
 export type DinerRecord = {
   id: number;

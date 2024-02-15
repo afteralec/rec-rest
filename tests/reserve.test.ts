@@ -1,4 +1,4 @@
-import { describe, test, beforeAll, afterAll } from "vitest";
+import { describe, test, beforeAll, afterAll, expect } from "vitest";
 import knex from "knex";
 import axios from "axios";
 
@@ -31,12 +31,16 @@ describe("Reserve inputs", () => {
   });
 
   test("can make a reservation given the correct inputs", async () => {
-    await axios.post("http://localhost:9090/reservations", {
-      restaurantId: 1,
-      zone: "America/New_York",
-      diners: ["Tobias", "Lucile"],
-      date: { month: 2, day: 24, year: 2024, hour: 17 },
-    });
+    const saveResponse = await axios.post(
+      "http://localhost:9090/reservations",
+      {
+        restaurantId: 1,
+        zone: "America/New_York",
+        diners: ["Tobias", "Lucile"],
+        date: { month: 2, day: 24, year: 2024, hour: 17 },
+      },
+    );
+    expect(saveResponse.status).toBe(201);
   });
 
   test.fails(
