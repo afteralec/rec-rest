@@ -2,7 +2,7 @@ import { DateTime } from "luxon";
 
 import type { Endorsement } from "../endorsements";
 import type { Reservation } from "../reservations";
-import type { DateInput } from "..";
+import type { DateInput } from "../input";
 
 export { loadRestaurantsForSearch } from "./load";
 

@@ -4,20 +4,13 @@ import dotenv from "dotenv";
 import knex from "knex";
 import { DateTime } from "luxon";
 
+import { isSearchInputValid, isReserveInputValid } from "./input";
 import { loadDinersForSearch } from "./diners";
 import { loadRestaurantsForSearch, availableTables } from "./restaurants";
 import { buildDinerEndorsementsForSearch } from "./endorsements";
+import type { SearchInput, ReserveInput } from "./input";
 
 const RESERVATION_DURATION_HOURS = 2;
-
-const ZONE_AMERICA_LOS_ANGELES = "America/Los_Angeles" as const;
-const ZONE_AMERICA_NEW_YORK = "America/New_York" as const;
-
-type Zone = typeof ZONE_AMERICA_LOS_ANGELES | typeof ZONE_AMERICA_NEW_YORK;
-const VALID_ZONES: { [key in Zone]: boolean } = {
-  [ZONE_AMERICA_LOS_ANGELES]: true,
-  [ZONE_AMERICA_NEW_YORK]: true,
-};
 
 dotenv.config();
 
@@ -34,89 +27,6 @@ const db = knex({
   },
   useNullAsDefault: true,
 });
-
-export type DateInput = {
-  hour: number;
-  day: number;
-  month: number;
-  year: number;
-  zone: string;
-};
-
-type SearchInput = {
-  diners: string[];
-  dates: DateInput[];
-  zone: Zone;
-};
-
-type ReserveInput = {
-  diners: string[];
-  date: DateInput;
-};
-
-// TODO: Let this function return a legible reason the input isn't valid
-function isDateInputValid(input: any): input is DateInput {
-  if (!("hour" in input)) return false;
-  if (typeof input.hour != "number") return false;
-
-  if (!("day" in input)) return false;
-  if (typeof input.day != "number") return false;
-
-  if (!("month" in input)) return false;
-  if (typeof input.month != "number") return false;
-
-  if (!("year" in input)) return false;
-  if (typeof input.year != "number") return false;
-
-  return true;
-}
-
-function isZoneValid(zone: any): zone is Zone {
-  if (typeof zone != "string") return false;
-  if (!VALID_ZONES[zone as Zone]) return false;
-
-  return true;
-}
-
-function isDinersArrayValid(diners: any): diners is string[] {
-  if (!Array.isArray(diners)) return false;
-  if (diners.length === 0) return false;
-  if (typeof diners[0] != "string") return false;
-
-  return true;
-}
-
-function isDateInputArrayValid(dates: any): dates is DateInput[] {
-  if (!Array.isArray(dates)) return false;
-  if (dates.length === 0) return false;
-  if (!isDateInputValid(dates[0])) return false;
-
-  return true;
-}
-
-// TODO: Let this function return a legible reason the input isn't valid
-function isSearchInputValid(input: any): input is SearchInput {
-  if (!("diners" in input)) return false;
-  if (!isDinersArrayValid(input.diners)) return false;
-
-  if (!("dates" in input)) return false;
-  if (!isDateInputArrayValid(input.dates)) return false;
-
-  if (!("zone" in input)) return false;
-  if (!isZoneValid(input.zone)) return false;
-
-  return true;
-}
-
-function isReserveInputValid(input: any): input is ReserveInput {
-  if (!("diners" in input)) return false;
-  if (!isDinersArrayValid(input.diners)) return false;
-
-  if (!("date" in input)) return false;
-  if (!isDateInputValid(input.date)) return false;
-
-  return true;
-}
 
 app.post(
   "/reservations/search",
