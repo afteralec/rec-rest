@@ -115,7 +115,7 @@ app.post(
 
     for (const diner of dinersList) {
       if (!dinerCanReserveAt(diner, { start, end })) {
-        res.status(401);
+        res.status(409);
         res.json(
           '{ "message": "That diner already has a reservation at that time." }',
         );
@@ -146,7 +146,7 @@ app.post(
     });
 
     if (reservationsAvailable.length === 0) {
-      res.status(401);
+      res.status(403);
       res.json("{ 'message': 'That time isn't available to reserve.' }");
       return;
     }
